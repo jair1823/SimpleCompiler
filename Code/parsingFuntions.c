@@ -1,18 +1,16 @@
 #include <stdio.h>
+#include "token_types.h"
+#include "stdlib.h"
 FILE *archi;
+token current_token;
+token next_T;
 
-char token_buffer[] = {'\0'};
-
-typedef enum token_types {
-    BEGIN, END, READ,WRITE, ID, INTLITERAL,
-    LPAREN, RPAREN, SEMICOLON, COMMA, ASSIGNOP,
-    PLUSOP, MINUSOP, SCANEOF
-} token;
 
 void system_goal(void){
   /* <system_goal> ::= <program> SCANEOF*/
   program();
-  match(SCANEOF)
+
+  match(SCANEOF);
 }
 
 void program(void){
@@ -28,8 +26,8 @@ void statement_list(void){
   *                        {statement}
   */
   statement();
-  while (TRUE) {
-    switch (next_token()) {
+  while (1) {
+    switch (next_T) {
       case ID:
       case READ:
       case WRITE:
@@ -42,7 +40,7 @@ void statement_list(void){
 }
 
 void statement(void){
-  token tok = next_token();
+  token tok = next_T;
   switch (tok) {
     case ID:
           /*<statement> ::= ID := <expression> ; */
@@ -71,7 +69,7 @@ void id_list(void){
   /*<id list> ::= ID { , ID}*/
   match(ID);
 
-  while (next_token() == COMMA){
+  while (next_T == COMMA){
     match(COMMA);
     match(ID);
   }
@@ -85,7 +83,7 @@ void expression(void){
                         { <add op> <primary>}
   */
   primary();
-  for (t = next_token(); t == PLUSOP || t == MINUSOP; t = next_token()){
+  for (t = next_T; t == PLUSOP || t == MINUSOP; t = next_T){
     add_op();
     primary();
   }
@@ -95,14 +93,14 @@ void expr_list(void){
   /*<expr_list> ::= <expression> { , <expression>} */
   expression();
 
-  while (next_token() == COMMA){
+  while (next_T == COMMA){
     match(COMMA);
     expression();
   }
 }
 
 void add_op(void){
-  token tok = next_token();
+  token tok = next_T;
   /* <addop> ::= PLUSOP | MINUSOP */
   if (tok == PLUSOP || tok == MINUSOP){
     match(tok);
@@ -112,7 +110,7 @@ void add_op(void){
 }
 
 void primary(void){
-  token tok = next_token();
+  token tok = next_T;
   switch (tok) {
     case LPAREN:
           /*<primary> ::= {<expression>}*/
@@ -133,9 +131,46 @@ void primary(void){
   }
 }
 
+void syntax_error(token t){
+  printf("syntax error %d\n",t);
+}
+/*
+token next_token(){
+  return next_T;
+}
+*/
+void match(token t){
+//  printf("current_token %d next_T %d\n", current_token, next_T);
+  if (t == BEGIN){
+    next_T = scanner();
+    printf("Comparo %d con %d\n",t,next_T);
+    if(next_T == BEGIN){
+      current_token = next_T;
+    //  printf("current_token %d\n",current_token);
+      next_T = scanner();
+    }else{
+      syntax_error(next_T);
+    }
+  }else{
+    printf("Comparo %d con %d\n",t,next_T);
+
+    if(next_T == t){
+      current_token = next_T;
+    //  printf("current_token %d\n",current_token);
+      next_T = scanner();
+    }else{
+
+      syntax_error(next_T);
+      /*poner o no next aqui
+      preguntar al profe*/
+    }
+  }
+}
+
 int main(){
   archi = fopen("lectura","r");
-  //todo el proceso
+  feof(archi);
+  system_goal();
   fclose(archi);
   return 0;
 }

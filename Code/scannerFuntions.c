@@ -1,20 +1,26 @@
 #include <stdio.h>
 #include "stdlib.h"
+#include "token_types.h"
 #include <ctype.h>
-//FILE *archi;
+extern FILE *archi;
 extern void * memset();
 extern size_t strlen();
 extern int strcmp();
-extern char token_buffer[];
+char token_buffer[] = {'\0'};
+
 
 void clear_buffer(){
-	memset(token_buffer, 0, sizeof token_buffer);
+	//printf("clear_buffer Inicio\n");
+	memset(token_buffer, 0,sizeof token_buffer);
+	//printf("clear_buffer Final\n");
 }
 
 void buffer_char(int tChar){
+	//printf("buffer_char Inicio\n");
 	size_t len = strlen(token_buffer);
   token_buffer[len] = tChar;
 	token_buffer[len + 1] = '\0';
+	//printf("buffer_char Inicio\n");
 
 }
 
@@ -38,9 +44,12 @@ void lexical_error(char tChar){
 token scanner(void){
 	int in_char, c;
 	clear_buffer();
+//	printf("breakpoint xd\n");
+//	printf("%d\n", feof(archi) );
 	if(feof(archi)){
 		return SCANEOF;
 	}
+
 	while ((in_char = fgetc(archi)) != EOF){
 		if (isspace(in_char))
 			continue;
@@ -57,7 +66,7 @@ token scanner(void){
 				   buffer_char(c);
       }
       ungetc(c, archi);
-
+			//printf("letra\n");
 			return check_reserved();
 		}else if (isdigit(in_char)) {
 			/*
@@ -69,23 +78,31 @@ token scanner(void){
 				buffer_char(c);
         //printf("is digit%c\n", c);
 			ungetc(c, archi);
+			//printf("numero\n");
 			return INTLITERAL;
-		} else if (in_char == '(')
+		} else if (in_char == '('){
+			//printf("(\n");
 			return LPAREN;
-		else if (in_char == ')')
+		}else if (in_char == ')'){
+		//	printf(")\n");
 			return RPAREN;
-		else if (in_char == ';')
+		}else if (in_char == ';'){
+		//	printf(";\n");
 			return SEMICOLON;
-		else if (in_char == ',')
+		}else if (in_char == ','){
+		//	printf(",\n");
 			return COMMA;
-		else if (in_char == '+')
+		}else if (in_char == '+'){
+		//	printf("+\n");
 			return PLUSOP;
-		else if (in_char == ':'){
+		}else if (in_char == ':'){
+
 			/* := */
 			c = fgetc(archi);
-			if ( c == '=')
+			if ( c == '='){
+				//printf(":=\n");
 				return ASSIGNOP;
-			else {
+			}else {
 				ungetc(c, archi);
 				lexical_error(in_char);
 			}
@@ -98,10 +115,14 @@ token scanner(void){
 				while (in_char != '\n');
 			} else {
 				ungetc(c, archi);
+				//printf("MINUSOP\n");
 				return MINUSOP;
 			}
 		} else
 			lexical_error(in_char);
+	}
+	if(feof(archi)){
+		return SCANEOF;
 	}
 }
 
