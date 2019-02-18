@@ -6,17 +6,19 @@ extern FILE *archi;
 extern void * memset();
 extern size_t strlen();
 extern int strcmp();
-char token_buffer[] = {'\0'};
+extern char token_buffer[] = {'\0'};
 
 
 void clear_buffer(){
 	//printf("clear_buffer Inicio\n");
-	memset(token_buffer, 0,sizeof token_buffer);
+
+	memset(token_buffer, 0,sizeof(token_buffer));
 	//printf("clear_buffer Final\n");
 }
 
 void buffer_char(int tChar){
 	//printf("buffer_char Inicio\n");
+
 	size_t len = strlen(token_buffer);
   token_buffer[len] = tChar;
 	token_buffer[len + 1] = '\0';
@@ -44,8 +46,10 @@ void lexical_error(char tChar){
 token scanner(void){
 	int in_char, c;
 	clear_buffer();
-//	printf("breakpoint xd\n");
-//	printf("%d\n", feof(archi) );
+
+
+
+
 	if(feof(archi)){
 		return SCANEOF;
 	}
@@ -172,10 +176,3 @@ void printToken(token t){
           break;
   }
 }
-
-/*int main(){
-  archi = fopen("lectura","r");
-  //todo el proceso
-  fclose(archi);
-  return 0;
-}*/
