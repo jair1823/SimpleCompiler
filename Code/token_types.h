@@ -3,3 +3,4 @@ typedef enum token_types {
     LPAREN, RPAREN, SEMICOLON, COMMA, ASSIGNOP,
     PLUSOP, MINUSOP, SCANEOF
 } token;
+ 
