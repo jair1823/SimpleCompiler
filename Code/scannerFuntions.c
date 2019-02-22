@@ -6,53 +6,82 @@ extern FILE *archi;
 extern void * memset();
 extern size_t strlen();
 extern int strcmp();
-extern char token_buffer[] = {'\0'};
 
+char token_buffer[] = {'\0'};
 
+//limpia el buffer para poder guardar el siguiente token
 void clear_buffer(){
-	//printf("clear_buffer Inicio\n");
-
-	memset(token_buffer, 0,sizeof(token_buffer));
-	//printf("clear_buffer Final\n");
+	printf("clear_buffer\n");
+	memset(token_buffer, 0, sizeof token_buffer);
+	printf("clear_buffer\n");
 }
 
+//agrega caracter por caracter del siguiente token al buffer
 void buffer_char(int tChar){
+	printf("buffer_char\n");
 	//printf("buffer_char Inicio\n");
 
 	size_t len = strlen(token_buffer);
   token_buffer[len] = tChar;
 	token_buffer[len + 1] = '\0';
+	printf("buffer_char\n");
 	//printf("buffer_char Inicio\n");
 
 }
 
+//se encarga de analizar si en el buffer se encuentra una palabra
+//reservada
 token check_reserved(){
-	if(strcmp(token_buffer,"BEGIN") == 0 || strcmp(token_buffer,"begin") == 0)
+	printf("check_reserved\n");
+	if(strcmp(token_buffer,"BEGIN") == 0 || strcmp(token_buffer,"begin") == 0){
+		printf("check_reserved\n");
 		return BEGIN;
-	else if(strcmp(token_buffer,"END") == 0 || strcmp(token_buffer,"end") == 0)
-		return END;
-	else if(strcmp(token_buffer,"READ") == 0 || strcmp(token_buffer,"read") == 0)
-		return READ;
-	else if(strcmp(token_buffer,"WRITE") == 0 || strcmp(token_buffer,"write") == 0)
-		return WRITE;
-	else
-		return ID;
+	}
+	else{
+		if(strcmp(token_buffer,"END") == 0 || strcmp(token_buffer,"end") == 0){
+			printf("check_reserved\n");
+			return END;
+		}
+		else{
+			if(strcmp(token_buffer,"READ") == 0 || strcmp(token_buffer,"read") == 0){
+				printf("check_reserved\n");
+				return READ;
+			}
+			else{
+				if(strcmp(token_buffer,"WRITE") == 0 || strcmp(token_buffer,"write") == 0){
+					printf("check_reserved\n");
+					return WRITE;
+				}
+				else{
+					printf("check_reserved\n");
+					return ID;
+				}
+			}
+		}
+	}
 }
 
+//muestra un lexical error justo en el char que sucedio
 void lexical_error(char tChar){
+	printf("lexical_error\n");
 	printf("Error in %c\n",tChar);
+	printf("lexical_error\n");
+	//se encarga de analizar el siguiente token
 }
+
+
 
 token scanner(void){
+	printf("scanner\n");
 	int in_char, c;
+
 	clear_buffer();
 
 
+	//con esto se pregunta si el archivo llego a su final
 
 
-	if(feof(archi)){
-		return SCANEOF;
-	}
+
 
 	while ((in_char = fgetc(archi)) != EOF){
 		if (isspace(in_char))
@@ -64,13 +93,11 @@ token scanner(void){
 					      | ID UNDERSCORE
 			*/
 			buffer_char(in_char);/**/
-
-
 			for (c = fgetc(archi); isalnum(c) || c == '_'; c = fgetc(archi)){
 				   buffer_char(c);
       }
       ungetc(c, archi);
-			//printf("letra\n");
+			printf("scanner\n");
 			return check_reserved();
 		}else if (isdigit(in_char)) {
 			/*
@@ -80,35 +107,34 @@ token scanner(void){
 			buffer_char(in_char);
 			for (c = fgetc(archi); isdigit(c); c = fgetc(archi))
 				buffer_char(c);
-        //printf("is digit%c\n", c);
 			ungetc(c, archi);
-			//printf("numero\n");
+			printf("scanner\n");
 			return INTLITERAL;
 		} else if (in_char == '('){
-			//printf("(\n");
+			printf("scanner\n");
 			return LPAREN;
 		}else if (in_char == ')'){
-		//	printf(")\n");
+			printf("scanner\n");
 			return RPAREN;
 		}else if (in_char == ';'){
-		//	printf(";\n");
+			printf("scanner\n");
 			return SEMICOLON;
 		}else if (in_char == ','){
-		//	printf(",\n");
+			printf("scanner\n");
 			return COMMA;
 		}else if (in_char == '+'){
-		//	printf("+\n");
+			printf("scanner\n");
 			return PLUSOP;
 		}else if (in_char == ':'){
-
 			/* := */
 			c = fgetc(archi);
 			if ( c == '='){
-				//printf(":=\n");
+				printf("scanner\n");
 				return ASSIGNOP;
 			}else {
 				ungetc(c, archi);
 				lexical_error(in_char);
+				printf("scanner\n");
 			}
 		} else if (in_char == '-') {
 			/*is it -- comment start*/
@@ -119,13 +145,15 @@ token scanner(void){
 				while (in_char != '\n');
 			} else {
 				ungetc(c, archi);
-				//printf("MINUSOP\n");
+				printf("scanner\n");
 				return MINUSOP;
 			}
 		} else
 			lexical_error(in_char);
+			printf("scanner\n");
 	}
 	if(feof(archi)){
+		printf("scanner\n");
 		return SCANEOF;
 	}
 }
