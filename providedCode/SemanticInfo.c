@@ -3,14 +3,14 @@
 
 #define MAXIDLEN 33
 typedef char string[MAXIDLEN];
-
+char token_buffer[];
 typedef struct operator{
 	/* for operators */
 	enum op { PLUS, MINUS } operator;
 } op_rec;
 
 /* expression types */
-enum expr { IDEXPR. LITERALEXPR, TEMPEXPR };
+enum expr { IDEXPR, LITERALEXPR, TEMPEXPR };
 
 /* for <primary> and <expression> */
 typedef struct expression{
@@ -21,12 +21,14 @@ typedef struct expression{
 	};
 } expr_rec;
 
+/*The specifications of our symbol table routines are:*/
 /* Is s in the symbol table? */
 extern int lookup(string s);
 
 /* Put s unconditionally into symbol table */
 extern void enter(string s);
 
+/*An auxiliary routine used by a number of the semantic routines is check_id*/
 void check_id(string s){
 	if (! lookup(s)){
 		enter(s);
@@ -74,9 +76,9 @@ expr_rec gen_infix(expr_rec e1, op_rec op, expr_rec e2){
 	/* Generate code for infix operation
 	 * Get result temp and set up semantic record
 	 * for result */
-	strcpy(erec.name, get_temp());
-	generate(extract(op), extract(el), extract(e2), erec.name);
-	return erec;
+	strcpy(e_rec.name, get_temp());
+	generate(extract(op), extract(el), extract(e2), e_rec.name);
+	return e_rec;
 }
 
 void read_id(expr_rec in_var){
@@ -86,7 +88,7 @@ void read_id(expr_rec in_var){
 
 expr_rec process_id(void){
 	expr_rec t;
-	/* Declare ID and build a 
+	/* Declare ID and build a
 	 * corresponding semantic record */
 	check_id(token_buffer);
 	t.kind = IDEXPR;
@@ -96,7 +98,7 @@ expr_rec process_id(void){
 
 expr_rec process_literal(void){
 	expr_rec t;
-	/* Convert literal to a numeric 
+	/* Convert literal to a numeric
 	 * representation and build semantic record */
 	t.kind = LITERALEXPR;
 	(void) sscanf(token_buffer, "%d", & t.val);

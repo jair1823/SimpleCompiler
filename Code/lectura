@@ -1,0 +1,5 @@
+BEGIN
+  z := 300;
+  read(a,b);
+  write(z-(a+b));
+END
