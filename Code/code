@@ -1,0 +1,12 @@
+Declare z, Integer
+Store 300,z
+Declare a, Integer
+Read a, Integer
+Declare b, Integer
+Read b, Integer
+Declare Temp&1, Integer
+ADD a,b,Temp&1
+Declare Temp&2, Integer
+SUB z,Temp&1,Temp&2
+Write Temp&2, Integer
+Halt 
