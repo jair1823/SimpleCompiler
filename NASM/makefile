@@ -1,5 +1,5 @@
-primero: primero.o
-	ld -m elf_i386 primero.o -o primero
+resultado: resultado.o
+	ld -m elf_i386 resultado.o -o resultado
 
-primero.o:	primero.asm
-	nasm -f elf primero.asm
+resultado.o:	resultado.asm
+	nasm -f elf resultado.asm
