@@ -22,9 +22,11 @@ typedef struct operator{
 
 typedef struct expression{
 	enum expr kind;
+	op_rec sing; /*constant_folding*/
 	union {
 		string name;	/* for IDEXPR, TEMPEXPR */
 		int val;		/* for LITERALEXPR */
+
 	};
 } expr_rec;
 
@@ -46,7 +48,7 @@ void check_id(string s){
 
 void generate(string s1, string s2, string s3, string s4){
   fprintf(code,"%s %s%s%s\n", s1, s2, s3, s4);
-	printf("%s %s %s %s\n", s1, s2, s3, s4);
+	printf("%s %s%s%s\n", s1, s2, s3, s4);
 }
 
 char *get_temp(void){
@@ -94,7 +96,6 @@ expr_rec gen_infix(expr_rec e1, op_rec op, expr_rec e2){
 	expr_rec e_rec;
 	/* An expr_rec with temp variant set */
 	e_rec.kind = TEMPEXPR;
-
 	/* Generate code for infix operation
 	 * Get result temp and set up semantic record
 	 * for result */
@@ -118,8 +119,8 @@ expr_rec gen_infix(expr_rec e1, op_rec op, expr_rec e2){
       strcpy(s2,e2.name);
       strcat(s2,",");
   }
-
 	generate(extract_op(op), s1, s2, e_rec.name);
+	e_rec.sing = e1.sing;
 	return e_rec;
 }
 
@@ -202,7 +203,7 @@ void expr_list(void){
   write_expr(source);
   while (next_T == COMMA){
 		match(COMMA);
-    expr_rec source1;
+		expr_rec source1;
     expression(&source1);
     write_expr(source1);
   }
@@ -260,14 +261,72 @@ void primary(expr_rec *result){
 void expression(expr_rec *result){
     expr_rec left_operand, right_operand;
     op_rec op;
-    primary(& left_operand);
+		op_rec sum;
+		sum.operator = PLUS;
+
+		//constant_folding
+		int first = 0; // 0 -> literal : 1 -> ID
+		int constant = 0;
+		int literal = 1;
+		int id = 0;
+		//constant_folding
+		primary(& left_operand);
+		//constant_folding
+		left_operand.sing = sum;
+		if(left_operand.kind == LITERALEXPR){
+			first = 0;
+			constant += left_operand.val;
+		}else{
+			first = 1;
+			literal = 0;
+		}
+		//constant_folding
 
     while (next_T == PLUSOP || next_T == MINUSOP) {
       add_op(& op);
       primary(& right_operand);
-      left_operand = gen_infix(left_operand, op, right_operand);
+			right_operand.sing = op;
+			//constant_folding
+			if(right_operand.kind == LITERALEXPR){
+				if(op.operator == PLUS){
+					constant += right_operand.val;
+				}else{
+					constant -= right_operand.val;
+				}
+			}else{
+				if(first){
+					left_operand = gen_infix(left_operand, op, right_operand);
+					id ++;
+				}else{
+					first = 1;
+					left_operand = right_operand;
+				}
+			}
+			//constant_folding
     }
-
+		//constant_folding
+		if(literal){
+			if(id != 0){
+				if(constant != 0){
+					expr_rec t;
+					t.kind = LITERALEXPR;
+				  t.val = constant;
+					t.sing = sum;
+					left_operand = gen_infix(t, left_operand.sing,left_operand);
+				}
+			}else{
+				left_operand.val = constant;
+			}
+		}else{
+			if(constant != 0){
+				expr_rec t;
+				t.kind = LITERALEXPR;
+			  t.val = constant;
+				t.sing = sum;
+				left_operand = gen_infix(t, left_operand.sing,left_operand);
+			}
+		}
+		//constant_folding
     *result = left_operand;
 }
 
@@ -281,7 +340,7 @@ void statement(void){
           match(ID);
           match(ASSIGNOP);
           expression(&source);
-          assign(target, source);
+					assign(target, source);
           match(SEMICOLON);
           break;
     case READ:
