@@ -238,7 +238,9 @@ void primary(expr_rec *result){
     case LPAREN:
           /*<primary> ::= {<expression>}*/
           match(LPAREN);
+
           expression(result);
+          
           match(RPAREN);
           break;
     case ID:
@@ -263,7 +265,7 @@ void expression(expr_rec *result){
     op_rec op;
 		op_rec sum;
 		sum.operator = PLUS;
-
+    int prueba = -5;
 		//constant_folding
 		int first = 0; // 0 -> literal : 1 -> ID
 		int constant = 0;
@@ -300,6 +302,7 @@ void expression(expr_rec *result){
 				}else{
 					first = 1;
 					left_operand = right_operand;
+          id ++;
 				}
 			}
 			//constant_folding
