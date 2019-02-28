@@ -54,18 +54,10 @@ void lexical_error(char tChar){
 }
 
 
-
+//Funcion principal del scanner, que toma el siguiente token del archivo
 token scanner(void){
 	int in_char, c;
-
 	clear_buffer();
-
-
-	//con esto se pregunta si el archivo llego a su final
-
-
-
-
 	while ((in_char = fgetc(archi)) != EOF){
 		if (isspace(in_char))
 			continue;

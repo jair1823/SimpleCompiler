@@ -1,3 +1,5 @@
 BEGIN
-  write(7+11-8-6+34-2);
+  A :=  4 + 4 + 4 + B;
+  WRITE(A);
 END
+ 
