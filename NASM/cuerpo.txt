@@ -1,4 +1,4 @@
-Sub 10,5,_TEMP1
-Store _TEMP1,A
+Sub 10,5,_Temp1
+Store _Temp1,A
 Write A,Integer
 Halt

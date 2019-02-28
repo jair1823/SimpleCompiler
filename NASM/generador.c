@@ -3,11 +3,13 @@
 #include <string.h>
 #include <ctype.h>
 #define MAXCHAR 1000
+#define MAXBYTES 2048
 
 char str[MAXCHAR];
 
 void escribirEncabezado(FILE *resultado){
-    fprintf(resultado, "%%include 'functions.asm'\n\n");
+    fprintf(resultado, "%%include 'functions.asm'\n");
+    fprintf(resultado, "%%define MAXBYTES 2048\n\n");
     fprintf(resultado, "section .bss\n");
 }
 
@@ -16,15 +18,72 @@ void escribirDeclares(FILE *resultado, FILE *declares){
     while (fgets(str, MAXCHAR, declares) != NULL){
         token = strtok(str, " ");
         token = strtok(NULL, ",");
-        fprintf(resultado, "\t%s resb 2048\n", token);
+        fprintf(resultado, "\t%s resb MAXBYTES\n", token);
     }
     fprintf(resultado, "\n");
 }
 
 void escribirIntermedio(FILE *resultado){
+    fprintf(resultado, "section .data\n");
+    fprintf(resultado, "\tmenos db 45\n\n");
+
     fprintf(resultado, "section .text\n");
     fprintf(resultado, "\tglobal _start\n\n");
     fprintf(resultado, "_start:\n");
+
+    fprintf(resultado, "\t;___________________________ Macros _________________________\n");
+    fprintf(resultado, "\t%%macro suma 3\n");
+    fprintf(resultado, "\t\tmov eax, %%1\n");
+    fprintf(resultado, "\t\tmov ebx, %%2\n");
+    fprintf(resultado, "\t\tadd eax, ebx\n");
+    fprintf(resultado, "\t\tmov [%%3], eax\n");
+    fprintf(resultado, "\t%%endmacro\n\n");
+
+    fprintf(resultado, "\t%%macro resta 3\n");
+    fprintf(resultado, "\t\tmov eax, %%1\n");
+    fprintf(resultado, "\t\tmov ebx, %%2\n");
+    fprintf(resultado, "\t\tsub eax, ebx\n");
+    fprintf(resultado, "\t\tmov [%%3], eax\n");
+    fprintf(resultado, "\t%%endmacro\n\n");
+
+    fprintf(resultado, "\t%%macro leer 1\n");
+    fprintf(resultado, "\t\tmov eax, 3\n");
+    fprintf(resultado, "\t\tmov ebx, 0\n");
+    fprintf(resultado, "\t\tmov ecx, %%1\n");
+    fprintf(resultado, "\t\tmov edx, MAXBYTES\n");
+    fprintf(resultado, "\t\tint 80h\n");
+    fprintf(resultado, "\t\tmov eax, ecx\n");
+    fprintf(resultado, "\t\tcall atoi\n");
+    fprintf(resultado, "\t\tmov [%%1], eax\n");
+    fprintf(resultado, "\t%%endmacro\n\n");
+
+    fprintf(resultado, "\t%%macro escribir 1\n");
+    fprintf(resultado, "\t\tmov eax, %%1\n");
+    fprintf(resultado, "\t\tcmp eax, 0\n");
+    fprintf(resultado, "\t\tjge .imprimir\n");
+    fprintf(resultado, "\t\tpush eax\n");
+    fprintf(resultado, "\t\tmov eax, 4\n");
+    fprintf(resultado, "\t\tmov ebx, 1\n");
+    fprintf(resultado, "\t\tmov ecx, menos\n");
+    fprintf(resultado, "\t\tmov edx, 1\n");
+    fprintf(resultado, "\t\tint 80h\n");
+    fprintf(resultado, "\t\tpop eax\n");
+    fprintf(resultado, "\t\tneg eax\n");
+    fprintf(resultado, "\t\t.imprimir:\n");
+    fprintf(resultado, "\t\t\tcall iprintLF\n");
+    fprintf(resultado, "\t%%endmacro\n\n");
+
+    fprintf(resultado, "\t%%macro guardar 2\n");
+    fprintf(resultado, "\t\tmov eax, %%1\n");
+    fprintf(resultado, "\t\tmov [%%2], eax\n");
+    fprintf(resultado, "\t%%endmacro\n\n");
+
+    fprintf(resultado, "\t%%macro salir 0\n");
+    fprintf(resultado, "\t\tmov eax, 1\n");
+    fprintf(resultado, "\t\tmov ebx, 0\n");
+    fprintf(resultado, "\t\tint 80h\n");
+    fprintf(resultado, "\t%%endmacro\n\n");
+    fprintf(resultado, "\t;___________________________ Código _________________________\n");
 }
 
 void escribirResta(FILE *resultado){
@@ -35,7 +94,7 @@ void escribirResta(FILE *resultado){
     if (!isdigit(p1[0]) && !isdigit(p2[0])){
         fprintf(resultado, "\tresta [%s], [%s], %s", p1, p2, p3);
     } else if (!isdigit(p1[0]) && isdigit(p2[0])) {
-        fprintf(resultado, "\tresta [%s], %s, %s", p1, p2, p3);
+        fprintf(resultado, "\tresta [%s], %s, %s", p1, p2, p3); 
     } else if (isdigit(p1[0]) && !isdigit(p2[0])) {
         fprintf(resultado, "\tresta %s, [%s], %s", p1, p2, p3);
     } else {
@@ -86,7 +145,6 @@ void escribirGuardar(FILE *resultado){
     }
     fprintf(resultado, "\n");
 }
-
 
 void escribirCuerpo(FILE *resultado, FILE *cuerpo){
     char *token;
