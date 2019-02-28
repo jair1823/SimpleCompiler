@@ -1,0 +1,2 @@
+Declare A,Integer
+Declare _Temp1,Integer

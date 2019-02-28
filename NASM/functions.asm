@@ -1,4 +1,5 @@
-;------------------------------------------
+;___________________________ Funciones _________________________
+
 ; void iprint(Integer number)
 ; Función que imprime enteros (itoa)
 iprint:

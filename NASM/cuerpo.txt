@@ -1,0 +1,4 @@
+Sub 10,5,_Temp1
+Store _Temp1,A
+Write A,Integer
+Halt
