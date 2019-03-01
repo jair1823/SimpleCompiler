@@ -133,6 +133,9 @@ atoi:
 .multiplyLoop:
     xor     ebx, ebx        ; reinicia los bytes más bajos y altos de ebx para que sean cero
     mov     bl, [esi+ecx]   ; mueve un solo byte a la mitad de abajo del registro ebx
+
+    cmp     bl, 45
+    je      .flag
     cmp     bl, 48          ; compara la mitad de abajo del registro ebx con el valor ascii 48(char value 0)
     jl      .finished       ; salta si es menor a la etiqueta del final
     cmp     bl, 57          ; compara el valor de la parte baja del registro ebx con el valor ascii 57(char value 9)
@@ -149,6 +152,11 @@ atoi:
     inc     ecx             ; incrementar ecx (el registro de contador)
     jmp     .multiplyLoop   ; se continua en el ciclo de multiplicación
 
+.flag:
+    mov     ebp, 1
+    inc     ecx             ; incrementar ecx (el registro de contador)
+    jmp     .multiplyLoop   ; se continua en el ciclo de multiplicación
+
 .finished:
     mov     ebx, 10         ; se mueve le valor decimal 10 a ebx
     div     ebx             ; se divide eax entre el valor en ebx (en este caso 10)
@@ -156,7 +164,7 @@ atoi:
     pop     edx             ; se reestablece el valor de edx que se habia puesto en el stack al inicio
     pop     ecx             ; se reestablece el valor de ecx que se habia puesto en el stack al inicio
     pop     ebx             ; se reestablece el valor de ebx que se habia puesto en el stack al inicio
-    ret
+    ret 
 
 ;------------------------------------------
 ;  Decimal to Binary function

@@ -55,13 +55,13 @@ void escribirIntermedio(FILE *resultado){
     fprintf(resultado, "\t%%endmacro\n\n");
 
     fprintf(resultado, "\t%%macro leer 1\n");
+    fprintf(resultado, "\t\tmov ebp, 0\n");    
     fprintf(resultado, "\t\tmov eax, 3\n");
     fprintf(resultado, "\t\tmov ebx, 0\n");
     fprintf(resultado, "\t\tmov ecx, %%1\n");
     fprintf(resultado, "\t\tmov edx, MAXBYTES\n");
     fprintf(resultado, "\t\tint 80h\n");
-    fprintf(resultado, "\t\tmov eax, ecx\n");
-    fprintf(resultado, "\t\tcall atoi\n");
+    fprintf(resultado, "\t\tcall guardarEntrada\n");
     fprintf(resultado, "\t\tmov [%%1], eax\n");
     fprintf(resultado, "\t%%endmacro\n\n");
 
@@ -152,6 +152,16 @@ void escribirGuardar(FILE *resultado){
 
 void escribirFunciones(FILE *resultado){
     fprintf(resultado, "\t;___________________________ Funciones _________________________\n");
+    fprintf(resultado, "\tguardarEntrada:\n");
+    fprintf(resultado, "\t\tmov ebp, 0\n");
+    fprintf(resultado, "\t\tmov eax, ecx\n");
+    fprintf(resultado, "\t\tcall atoi\n");
+    fprintf(resultado, "\t\tcmp ebp, 0\n");
+    fprintf(resultado, "\t\tje .guardar\n");
+    fprintf(resultado, "\t\tneg eax\n");
+    fprintf(resultado, "\t\t.guardar:\n");
+    fprintf(resultado, "\t\t\tret\n\n");
+
     fprintf(resultado, "\tverificarNegativo:\n");
     fprintf(resultado, "\t\tcmp eax, 0\n");
     fprintf(resultado, "\t\tjge .return\n");
