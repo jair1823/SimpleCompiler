@@ -1,4 +1,8 @@
 Sub 10,5,_Temp1
 Store _Temp1,A
 Write A,Integer
+Store -10,B
+Store 10,C
+Write B,Integer
+Write C,Integer
 Halt

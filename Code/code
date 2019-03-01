@@ -1,12 +1,7 @@
-Declare z, Integer
-Store 300,z
-Declare a, Integer
-Read a, Integer
-Declare b, Integer
-Read b, Integer
+Declare A, Integer
+Declare B, Integer
 Declare Temp&1, Integer
-ADD a,b,Temp&1
-Declare Temp&2, Integer
-SUB z,Temp&1,Temp&2
-Write Temp&2, Integer
+ADD 12,B,Temp&1
+Store Temp&1,A
+Write A, Integer
 Halt 

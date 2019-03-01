@@ -1,5 +1,5 @@
 BEGIN
-  z := 300;
-  read(a,b);
-  write(z-(a+b));
+  A :=  4 + 4 + 4 + B;
+  WRITE(A);
 END
+ 
