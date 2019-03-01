@@ -46,6 +46,14 @@ void escribirIntermedio(FILE *resultado){
     fprintf(resultado, "\t\tmov [%%3], eax\n");
     fprintf(resultado, "\t%%endmacro\n\n");
 
+    fprintf(resultado, "\t%%macro imprimirMenos 0\n");
+    fprintf(resultado, "\t\tmov eax, 4\n");
+    fprintf(resultado, "\t\tmov ebx, 1\n");
+    fprintf(resultado, "\t\tmov ecx, menos\n");
+    fprintf(resultado, "\t\tmov edx, 1\n");
+    fprintf(resultado, "\t\tint 80h\n");
+    fprintf(resultado, "\t%%endmacro\n\n");
+
     fprintf(resultado, "\t%%macro leer 1\n");
     fprintf(resultado, "\t\tmov eax, 3\n");
     fprintf(resultado, "\t\tmov ebx, 0\n");
@@ -59,18 +67,8 @@ void escribirIntermedio(FILE *resultado){
 
     fprintf(resultado, "\t%%macro escribir 1\n");
     fprintf(resultado, "\t\tmov eax, %%1\n");
-    fprintf(resultado, "\t\tcmp eax, 0\n");
-    fprintf(resultado, "\t\tjge .imprimir\n");
-    fprintf(resultado, "\t\tpush eax\n");
-    fprintf(resultado, "\t\tmov eax, 4\n");
-    fprintf(resultado, "\t\tmov ebx, 1\n");
-    fprintf(resultado, "\t\tmov ecx, menos\n");
-    fprintf(resultado, "\t\tmov edx, 1\n");
-    fprintf(resultado, "\t\tint 80h\n");
-    fprintf(resultado, "\t\tpop eax\n");
-    fprintf(resultado, "\t\tneg eax\n");
-    fprintf(resultado, "\t\t.imprimir:\n");
-    fprintf(resultado, "\t\t\tcall iprintLF\n");
+    fprintf(resultado, "\t\tcall verificarNegativo\n");
+    fprintf(resultado, "\t\tcall iprintLF\n");
     fprintf(resultado, "\t%%endmacro\n\n");
 
     fprintf(resultado, "\t%%macro guardar 2\n");
@@ -138,12 +136,31 @@ void escribirWrite(FILE *resultado){
 void escribirGuardar(FILE *resultado){
     char *p1 = strtok(NULL, ",");
     char *p2 = strtok(NULL, "\n");
+
     if (!isdigit(p1[0])){
-        fprintf(resultado, "\tguardar [%s], %s", p1, p2);
+        // Condicional para evaluar - (negativos)
+        if (!(p1[0] == '-')){
+            fprintf(resultado, "\tguardar [%s], %s", p1, p2);
+        } else {
+            fprintf(resultado, "\tguardar %s, %s", p1, p2);
+        }
     } else {
         fprintf(resultado, "\tguardar %s, %s", p1, p2);
     }
     fprintf(resultado, "\n");
+}
+
+void escribirFunciones(FILE *resultado){
+    fprintf(resultado, "\t;___________________________ Funciones _________________________\n");
+    fprintf(resultado, "\tverificarNegativo:\n");
+    fprintf(resultado, "\t\tcmp eax, 0\n");
+    fprintf(resultado, "\t\tjge .return\n");
+    fprintf(resultado, "\t\tpush eax\n");
+    fprintf(resultado, "\t\timprimirMenos\n");
+    fprintf(resultado, "\t\tpop eax\n");
+    fprintf(resultado, "\t\tneg eax\n");
+    fprintf(resultado, "\t\t.return:\n");
+    fprintf(resultado, "\t\t\tret\n");
 }
 
 void escribirCuerpo(FILE *resultado, FILE *cuerpo){
@@ -162,9 +179,10 @@ void escribirCuerpo(FILE *resultado, FILE *cuerpo){
         } else if (!strcmp(token, "Store")){
             escribirGuardar(resultado);
         } else {
-            fprintf(resultado, "\tsalir"); 
+            fprintf(resultado, "\tsalir\n\n"); 
         }
     }
+    escribirFunciones(resultado);
 }
 
 int main(){
