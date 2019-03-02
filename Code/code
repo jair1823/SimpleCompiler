@@ -1,7 +1,0 @@
-Declare A, Integer
-Declare B, Integer
-Declare Temp&1, Integer
-ADD 12,B,Temp&1
-Store Temp&1,A
-Write A, Integer
-Halt 
