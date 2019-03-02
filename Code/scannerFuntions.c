@@ -83,6 +83,8 @@ token scanner(void){
 				buffer_char(c);
 			ungetc(c, archi);
 			return INTLITERAL;
+		} else if (in_char == '|'){
+			return PIPE;
 		} else if (in_char == '('){
 			return LPAREN;
 		}else if (in_char == ')'){

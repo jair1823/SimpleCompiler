@@ -10,6 +10,7 @@ extern char token_buffer[];
 
 FILE *archi;
 FILE *code;
+FILE *declare;
 token current_token;
 token next_T;
 
@@ -35,14 +36,14 @@ void syntax_error(token t){
 }
 
 string * extract_op(op_rec source){
-  return (source.operator == PLUS ? "ADD":"SUB");
+  return (source.operator == PLUS ? "Add":"Sub");
 }
 
 /*An auxiliary routine used by a number of the semantic routines is check_id*/
 void check_id(string s){
 	if (! lookup(s)){
     enter(s);
-		generate("Declare", s, ", Integer", "");
+		generate_de("Declare", s, ",Integer", "");
 	}
 }
 
@@ -51,13 +52,38 @@ void generate(string s1, string s2, string s3, string s4){
 	printf("%s %s%s%s\n", s1, s2, s3, s4);
 }
 
+void generate_de(string s1, string s2, string s3, string s4){
+  fprintf(declare,"%s %s%s%s\n", s1, s2, s3, s4);
+	printf("%s %s%s%s\n", s1, s2, s3, s4);
+}
+
 char *get_temp(void){
 	/* max temporary allocated so far */
 	static int max_temp = 0;
 	static char tempname[MAXIDLEN];
 	max_temp++;
-	sprintf(tempname, "Temp&%d", max_temp);
+	sprintf(tempname, "_Temp%d", max_temp);
 	check_id(tempname);
+	return tempname;
+}
+
+char *get_condi(void){
+	/* max temporary allocated so far */
+	static int max_temp = 0;
+	static char tempname[MAXIDLEN];
+	max_temp++;
+	sprintf(tempname, "_Condi%d", max_temp);
+	//check_id(tempname);
+	return tempname;
+}
+
+char *get_contin(void){
+	/* max temporary allocated so far */
+	static int max_temp = 0;
+	static char tempname[MAXIDLEN];
+	max_temp++;
+	sprintf(tempname, "_contin%d", max_temp);
+	//check_id(tempname);
 	return tempname;
 }
 
@@ -126,7 +152,7 @@ expr_rec gen_infix(expr_rec e1, op_rec op, expr_rec e2){
 
 void read_id(expr_rec in_var){
 	/* Generate code for read */
-	generate("Read", in_var.name, ", Integer", "");
+	generate("Read", in_var.name, ",Integer", "");
 }
 
 expr_rec process_id(void){
@@ -158,7 +184,7 @@ void write_expr(expr_rec out_expr){
       strcpy(s1,out_expr.name);
       strcat(s1,",");
   }
-	generate("Write", s1, " Integer", "");
+	generate("Write", s1, "Integer", "");
 }
 
 void match(token t){
@@ -232,16 +258,76 @@ void id_list(void){
   }
 }
 
+void skip(expr_rec e){
+	string s;
+  if(e.kind == LITERALEXPR){
+    sprintf(s,"%d",e.val);
+
+  }
+  else{
+      strcpy(s,e.name);
+
+  }
+	generate("Skip",s,"","");
+}
+
+void jnz(string s){
+	generate("JumpNotZero",s,"","");
+}
+
+void jmp(string s){
+	generate("Jump",s,"","");
+}
+
+void eti(string s){
+	strcat(s,":");
+	generate("Etiqueta",s,"","");
+}
+
+
 void primary(expr_rec *result){
   token tok = next_T;
+	op_rec sum;
+	sum.operator = PLUS;
   switch (tok) {
     case LPAREN:
           /*<primary> ::= {<expression>}*/
           match(LPAREN);
-
-          expression(result);
-          
-          match(RPAREN);
+					expr_rec e1;
+					expression(&e1);
+					if(next_T == RPAREN){
+						*result = e1;
+	          match(RPAREN);
+					}else{
+						if(next_T == PIPE){
+							expr_rec t;
+							t.kind = TEMPEXPR;
+							strcpy(t.name, get_temp());
+							t.sing = sum;
+							skip(e1);
+							match(PIPE);
+							string condi;
+							string contin;
+							strcpy(condi,get_condi());
+							strcpy(contin,get_contin());
+							jnz(condi);
+							expr_rec e2;
+							expression(&e2);
+							assign(t,e2);
+							jmp(contin);
+							eti(condi);
+							match(PIPE);
+							expr_rec e3;
+							expression(&e3);
+							assign(t,e3);
+							jmp(contin);
+							eti(contin);
+							match(RPAREN);
+							*result = t;
+						} else{
+							syntax_error(current_token);
+						}
+					}
           break;
     case ID:
           /*<primary> ::= ID*/
@@ -401,12 +487,21 @@ void system_goal(void){
   match(SCANEOF);
 }
 
+/*int main(int argc, char const *argv[]){
+  archi = fopen(argv[1],"r");
+  code = fopen(argv[2],"w");
+	declare = fopen(argv[3],"w");
+*/
+
 int main(){
-  archi = fopen("lectura","r");
-  code = fopen("code","w");
+  archi = fopen("lectura.micro","r");
+  code = fopen("code.tmp","w");
+	declare = fopen("declare.tmp","w");
   feof(archi);
   system_goal();
   fclose(archi);
   fclose(code);
+	fclose(declare);
+	/*code Paolo*/
 	return 0;
 }

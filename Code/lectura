@@ -1,5 +1,0 @@
-BEGIN
-  A :=  4 + 4 + 4 + B;
-  WRITE(A);
-END
- 
