@@ -13,9 +13,9 @@ void escribirEncabezado(FILE *resultado){
     fprintf(resultado, "section .bss\n");
 }
 
-void escribirDeclares(FILE *resultado, FILE *declares){
+void escribirDeclare(FILE *resultado, FILE *declare){
     char *token;
-    while (fgets(str, MAXCHAR, declares) != NULL){
+    while (fgets(str, MAXCHAR, declare) != NULL){
         token = strtok(str, " ");
         token = strtok(NULL, ",");
         fprintf(resultado, "\t%s resb MAXBYTES\n", token);
@@ -173,9 +173,9 @@ void escribirFunciones(FILE *resultado){
     fprintf(resultado, "\t\t\tret\n");
 }
 
-void escribirCuerpo(FILE *resultado, FILE *cuerpo){
+void escribirCuerpo(FILE *resultado, FILE *code){
     char *token;
-    while (fgets(str, MAXCHAR, cuerpo) != NULL){
+    while (fgets(str, MAXCHAR, code) != NULL){
         token = strtok(str, " ");
 
         if (!strcmp(token, "Sub")){
@@ -197,8 +197,8 @@ void escribirCuerpo(FILE *resultado, FILE *cuerpo){
 
 int main(){
     FILE *resultado;
-    FILE *declares;
-    FILE *cuerpo;
+    FILE *declare;
+    FILE *code;
 
     resultado = fopen("resultado.asm", "w");
     if(resultado == NULL){
@@ -206,25 +206,25 @@ int main(){
         return 0;
     }
 
-    declares = fopen("declares.txt", "r");
-    if(declares == NULL){
+    declare = fopen("declare.tmp", "r");
+    if(declare == NULL){
         fprintf(stderr, "Error al abrir el archivo de declaraciones.");
         return 0;
     }
 
-    cuerpo = fopen("cuerpo.txt", "r");
-    if(cuerpo == NULL){
+    code = fopen("code.tmp", "r");
+    if(code == NULL){
         fprintf(stderr, "Error al abrir el archivo con el cuerpo del código.");
         return 0;
     }
 
     escribirEncabezado(resultado);
-    escribirDeclares(resultado, declares);
+    escribirDeclare(resultado, declare);
     escribirIntermedio(resultado);
-    escribirCuerpo(resultado, cuerpo);
+    escribirCuerpo(resultado, code);
 
-    fclose(declares);
-    fclose(cuerpo);
+    fclose(declare);
+    fclose(code);
     fclose(resultado);
     return 0;
 }
