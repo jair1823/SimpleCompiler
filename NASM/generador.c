@@ -119,8 +119,10 @@ void escribirSuma(FILE *resultado){
 }
 
 void escribirRead(FILE *resultado){
-    char *p1 = strtok(NULL, "\n");
+    char *p1 = strtok(NULL, ",");
+    //char *p1 = strtok(NULL, "\n");
     fprintf(resultado, "\tleer %s", p1);
+    fprintf(resultado, "\n");
 }
 
 void escribirWrite(FILE *resultado){
