@@ -9,7 +9,7 @@ extern void enter(string s);
 extern char token_buffer[];
 
 FILE *archi;
-FILE *code;
+FILE *inter;
 FILE *declare;
 token current_token;
 token next_T;
@@ -48,13 +48,13 @@ void check_id(string s){
 }
 
 void generate(string s1, string s2, string s3, string s4){
-  fprintf(code,"%s %s%s%s\n", s1, s2, s3, s4);
-	printf("%s %s%s%s\n", s1, s2, s3, s4);
+  fprintf(inter,"%s %s%s%s\n", s1, s2, s3, s4);
+	//printf("%s %s%s%s\n", s1, s2, s3, s4);
 }
 
 void generate_de(string s1, string s2, string s3, string s4){
   fprintf(declare,"%s %s%s%s\n", s1, s2, s3, s4);
-	printf("%s %s%s%s\n", s1, s2, s3, s4);
+	//printf("%s %s%s%s\n", s1, s2, s3, s4);
 }
 
 char *get_temp(void){
@@ -284,7 +284,6 @@ void eti(string s){
 	generate("Etiqueta",s,"","");
 }
 
-
 void primary(expr_rec *result){
   token tok = next_T;
 	op_rec sum;
@@ -487,21 +486,71 @@ void system_goal(void){
   match(SCANEOF);
 }
 
-/*int main(int argc, char const *argv[]){
-  archi = fopen(argv[1],"r");
-  code = fopen(argv[2],"w");
-	declare = fopen(argv[3],"w");
-*/
-
-int main(){
-  archi = fopen("lectura.micro","r");
-  code = fopen("code.tmp","w");
+int main(int argc, char const *argv[]){
+	archi = fopen(argv[1],"r");
+	if(archi == NULL){
+			fprintf(stderr, "Error al leer el archivo %s\n",argv[1]);
+			return 0;
+	}
+	inter = fopen("inter.tmp","w");
+	if(inter == NULL){
+			fprintf(stderr, "Error al escribir el archivo inter.tmp\n");
+			return 0;
+	}
 	declare = fopen("declare.tmp","w");
-  feof(archi);
+	if(declare == NULL){
+			fprintf(stderr, "Error al escribir el archivo declare.tmp\n");
+			return 0;
+	}
   system_goal();
   fclose(archi);
-  fclose(code);
+  fclose(inter);
 	fclose(declare);
-	/*code Paolo*/
+	string ensam,nasm,ld,eje;
+	strcpy(ensam,strtok(argv[1],"."));
+	strcat(ensam,".asm");
+	strcpy(nasm,"nasm -f elf ");
+	strcat(nasm,ensam);
+	strcpy(ld,"ld -m elf_i386 ");
+	strcat(ld,argv[1]);
+	strcat(ld,".o");
+	strcat(ld," -o ");
+	strcat(ld,argv[1]);
+	FILE *resultado;
+	FILE *decla;
+	FILE *code;
+	resultado = fopen(ensam, "w");
+	if(resultado == NULL){
+			fprintf(stderr, "Error al escribir el archivo %s\n",ensam);
+			return 0;
+	}
+	decla = fopen("declare.tmp", "r");
+	if(decla == NULL){
+			fprintf(stderr, "Error al abrir el archivo declare.tmp\n");
+			return 0;
+	}
+	code = fopen("inter.tmp", "r");
+	if(code == NULL){
+			fprintf(stderr, "Error al abrir el archivo inter.tmp\n");
+			return 0;
+	}
+	escribirEncabezado(resultado);
+	escribirDeclare(resultado, decla);
+	escribirIntermedio(resultado);
+	escribirCuerpo(resultado, code);
+	escribirFunciones(resultado);
+	fclose(decla);
+	fclose(code);
+	fclose(resultado);
+	printf("%s\n",nasm );
+	system(nasm);
+	printf("%s\n",ld);
+	system(ld);
+	strcpy(eje,"./");
+	strcat(eje,argv[1]);
+	printf("%s\n",eje);
+	system(eje);
+	printf("remove tmps\n");
+	system("rm inter.tmp declare.tmp");
 	return 0;
 }

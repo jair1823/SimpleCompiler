@@ -1,5 +1,5 @@
 BEGIN
-  A := 5;
-  read(B);
-  write(A+B);
+  READ(B);
+  A := (B|4|10);
+  write(A);
 END

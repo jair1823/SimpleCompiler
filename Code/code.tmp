@@ -1,5 +1,0 @@
-Store 5,A
-Read B,Integer
-Add A,B,_Temp1
-Write _Temp1,Integer
-Halt 

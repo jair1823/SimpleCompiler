@@ -1,2 +1,8 @@
+compiler
+lectura
+lectura.asm
+lectura.o
+NASM
+AtoiAndNegative
+providedCode
 prueba
-*.pdf
