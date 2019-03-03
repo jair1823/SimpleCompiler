@@ -1,0 +1,5 @@
+BEGIN
+  read(A);
+  B := (((A-1|0|1)|0|1)|0|1);
+  write(B);
+END
