@@ -159,7 +159,7 @@ void escribirGuardar(FILE *resultado){
 
 void escribirJumpNotZero(FILE *resultado){
     char *p1 = strtok(NULL, "\n");
-    fprintf(resultado, "\tjnz %s\n", p1);
+    fprintf(resultado, "\tjz %s\n", p1);
 }
 
 void escribirJump(FILE *resultado){
