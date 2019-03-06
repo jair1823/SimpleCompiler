@@ -149,8 +149,13 @@ void escribirRead(FILE *resultado){
 
 void escribirWrite(FILE *resultado){
     char *p1 = strtok(NULL, ",");
-    if 		(!isdigit(p1[0])) 	fprintf(resultado, "\tescribir [%s]", p1);
-    else 						fprintf(resultado, "\tescribir %s", p1);
+
+	if (!isdigit(p1[0])){
+        if 		(!(p1[0] == '-'))	fprintf(resultado, "\tescribir [%s]", p1);
+        else 						fprintf(resultado, "\tescribir %s", p1);
+    } else {
+        fprintf(resultado, "\tescribir %s", p1);
+    }
     fprintf(resultado, "\n");
 }
 

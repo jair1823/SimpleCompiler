@@ -1,5 +1,4 @@
 BEGIN
-  abcdeabcdeabcdeabcdeabcdeabcde12:= 5;
-  read(abcdeabcde);
-  write(abcdeabcdeabcdeabcdeabcdeabcde12+54+abcdeabcde);
+  a := 6-8;
+  write (a, 6-8);
 END

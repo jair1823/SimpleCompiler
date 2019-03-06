@@ -2,10 +2,7 @@
 %define MAXBYTES 2048
 
 section .bss
-	abcdeabcdeabcdeabcdeabcdeabcde12 resb MAXBYTES
-	abcdeabcde resb MAXBYTES
-	_Temp1 resb MAXBYTES
-	_Temp2 resb MAXBYTES
+	a resb MAXBYTES
 
 section .data
 	menos db 45
@@ -82,11 +79,9 @@ section .text
 
 ;_________________________________________________ Código __________________________________________________
 _start:
-	guardar 5, abcdeabcdeabcdeabcdeabcdeabcde12
-	leer abcdeabcde
-	suma [abcdeabcdeabcdeabcdeabcdeabcde12], [abcdeabcde], _Temp1
-	suma 54, [_Temp1], _Temp2
-	escribir [_Temp2]
+	guardar -2, a
+	escribir [a]
+	escribir -2
 	salir
 
 ;________________________________________________ Funciones ________________________________________________
