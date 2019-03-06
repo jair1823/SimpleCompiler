@@ -72,7 +72,7 @@ section .text
 _start:
 	leer B
 	skip [B]
-	jnz _Condi1
+	jz _Condi1
 	guardar 4, _Temp1
 	jmp _contin1
 	_Condi1:

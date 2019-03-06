@@ -6,7 +6,7 @@ extern FILE *archi;
 extern void * memset();
 extern size_t strlen();
 extern int strcmp();
-
+extern int compilerError;
 char token_buffer[] = {'\0'};
 
 //limpia el buffer para poder guardar el siguiente token
@@ -49,7 +49,8 @@ token check_reserved(){
 
 //muestra un lexical error justo en el char que sucedio
 void lexical_error(char tChar){
-	printf("Error in %c\n",tChar);
+	compilerError = 1;
+	printf("lexical error\n");
 	//se encarga de analizar el siguiente token
 }
 
