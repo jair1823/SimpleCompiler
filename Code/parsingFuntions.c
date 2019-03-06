@@ -11,7 +11,6 @@ extern char token_buffer[];
 FILE *archi;
 FILE *inter;
 FILE *declare;
-int compilerError = 0;
 token current_token;
 token next_T;
 
@@ -33,8 +32,8 @@ typedef struct expression{
 } expr_rec;
 
 void syntax_error(token t){
-	compilerError = 1;
   printf("syntax error %d\n",t);
+	exit(1);
 }
 
 string * extract_op(op_rec source){
@@ -519,45 +518,42 @@ int main(int argc, char const *argv[]){
 	strcat(ld," -o ");
 	strcat(ld,argv[1]);
 
-	printf("compilerError %d\n",compilerError);
-
-	if(!compilerError){
-		FILE *resultado;
-		FILE *decla;
-		FILE *code;
-		resultado = fopen(ensam, "w");
-		if(resultado == NULL){
-				fprintf(stderr, "Error al escribir el archivo %s\n",ensam);
-				return 0;
-		}
-		decla = fopen("declare.tmp", "r");
-		if(decla == NULL){
-				fprintf(stderr, "Error al abrir el archivo declare.tmp\n");
-				return 0;
-		}
-		code = fopen("inter.tmp", "r");
-		if(code == NULL){
-				fprintf(stderr, "Error al abrir el archivo inter.tmp\n");
-				return 0;
-		}
-		escribirEncabezado(resultado);
-		escribirDeclare(resultado, decla);
-		escribirIntermedio(resultado);
-		escribirCuerpo(resultado, code);
-		escribirFunciones(resultado);
-		fclose(decla);
-		fclose(code);
-		fclose(resultado);
-		printf("%s\n",nasm );
-		system(nasm);
-		printf("%s\n",ld);
-		system(ld);
-		strcpy(eje,"./");
-		strcat(eje,argv[1]);
-		printf("%s\n",eje);
-		system(eje);
-		//printf("remove tmps\n");
-		system("rm inter.tmp declare.tmp");
+	FILE *resultado;
+	FILE *decla;
+	FILE *code;
+	resultado = fopen(ensam, "w");
+	if(resultado == NULL){
+			fprintf(stderr, "Error al escribir el archivo %s\n",ensam);
+			return 0;
 	}
+	decla = fopen("declare.tmp", "r");
+	if(decla == NULL){
+			fprintf(stderr, "Error al abrir el archivo declare.tmp\n");
+			return 0;
+	}
+	code = fopen("inter.tmp", "r");
+	if(code == NULL){
+			fprintf(stderr, "Error al abrir el archivo inter.tmp\n");
+			return 0;
+	}
+	escribirEncabezado(resultado);
+	escribirDeclare(resultado, decla);
+	escribirIntermedio(resultado);
+	escribirCuerpo(resultado, code);
+	escribirFunciones(resultado);
+	fclose(decla);
+	fclose(code);
+	fclose(resultado);
+	printf("%s\n",nasm );
+	system(nasm);
+	printf("%s\n",ld);
+	system(ld);
+	strcpy(eje,"./");
+	strcat(eje,argv[1]);
+	printf("%s\n",eje);
+	system(eje);
+	//printf("remove tmps\n");
+	system("rm inter.tmp declare.tmp");
+
 	return 0;
 }

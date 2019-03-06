@@ -7,18 +7,21 @@ extern void * memset();
 extern size_t strlen();
 extern int strcmp();
 extern int compilerError;
-char token_buffer[] = {'\0'};
+char token_buffer[64];
+int lenTokenBuffer = 0;
 
 //limpia el buffer para poder guardar el siguiente token
 void clear_buffer(){
-	memset(token_buffer, 0, sizeof token_buffer);
+	lenTokenBuffer = 0;
+	memset(token_buffer, 0, 64);
 }
 
 //agrega caracter por caracter del siguiente token al buffer
 void buffer_char(int tChar){
-	size_t len = strlen(token_buffer);
-  token_buffer[len] = tChar;
-	token_buffer[len + 1] = '\0';
+	token_buffer[lenTokenBuffer] = tChar;
+	token_buffer[lenTokenBuffer + 1] = '\0';
+	lenTokenBuffer ++;
+
 }
 
 //se encarga de analizar si en el buffer se encuentra una palabra
@@ -49,8 +52,8 @@ token check_reserved(){
 
 //muestra un lexical error justo en el char que sucedio
 void lexical_error(char tChar){
-	compilerError = 1;
-	printf("lexical error\n");
+	printf("lexical error near '%c'\n",tChar);
+	exit(1);
 	//se encarga de analizar el siguiente token
 }
 
@@ -69,9 +72,14 @@ token scanner(void){
 					      | ID UNDERSCORE
 			*/
 			buffer_char(in_char);/**/
+
 			for (c = fgetc(archi); isalnum(c) || c == '_'; c = fgetc(archi)){
-				   buffer_char(c);
+					 buffer_char(c);
       }
+			if(lenTokenBuffer > 32){
+				printf("Nombre de variable %s supera los 32 caracteres\n",token_buffer);
+				exit(1);
+			}
       ungetc(c, archi);
 			return check_reserved();
 		}else if (isdigit(in_char)) {
@@ -103,7 +111,7 @@ token scanner(void){
 				return ASSIGNOP;
 			}else {
 				ungetc(c, archi);
-				lexical_error(in_char);
+				lexical_error(':');
 			}
 		} else if (in_char == '-') {
 			/*is it -- comment start*/

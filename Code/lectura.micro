@@ -1,5 +1,5 @@
 BEGIN
-  READ(B);
-  A := (B|4|10);
-  write(A);
+  abcdeabcdeabcdeabcdeabcdeabcde12:= 5;
+  read(abcdeabcde);
+  write(abcdeabcdeabcdeabcdeabcdeabcde12+54+abcdeabcde);
 END

@@ -2,9 +2,10 @@
 %define MAXBYTES 2048
 
 section .bss
-	B resb MAXBYTES
-	A resb MAXBYTES
+	abcdeabcdeabcdeabcdeabcdeabcde12 resb MAXBYTES
+	abcdeabcde resb MAXBYTES
 	_Temp1 resb MAXBYTES
+	_Temp2 resb MAXBYTES
 
 section .data
 	menos db 45
@@ -70,17 +71,11 @@ section .text
 
 ;_________________________________________________ Código __________________________________________________
 _start:
-	leer B
-	skip [B]
-	jz _Condi1
-	guardar 4, _Temp1
-	jmp _contin1
-	_Condi1:
-	guardar 10, _Temp1
-	jmp _contin1
-	_contin1:
-	guardar [_Temp1], A
-	escribir [A]
+	guardar 5, abcdeabcdeabcdeabcdeabcdeabcde12
+	leer abcdeabcde
+	suma [abcdeabcdeabcdeabcdeabcdeabcde12], [abcdeabcde], _Temp1
+	suma 54, [_Temp1], _Temp2
+	escribir [_Temp2]
 	salir
 
 ;________________________________________________ Funciones ________________________________________________
