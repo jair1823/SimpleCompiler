@@ -26,6 +26,7 @@ void escribirDeclare(FILE *resultado, FILE *declare){
 void escribirIntermedio(FILE *resultado){
     fprintf(resultado, "section .data\n");
     fprintf(resultado, "\tmenos db 45\n\n");
+    fprintf(resultado, "\tdosPuntos db 58\n\n");
 
     fprintf(resultado, "section .text\n");
     fprintf(resultado, "\tglobal _start\n\n");
@@ -53,7 +54,16 @@ void escribirIntermedio(FILE *resultado){
     fprintf(resultado, "\tint 80h\n");
     fprintf(resultado, "%%endmacro\n\n");
 
+    fprintf(resultado, "%%macro imprimirDosPuntos 0\n");
+    fprintf(resultado, "\tmov eax, 4\n");
+    fprintf(resultado, "\tmov ebx, 1\n");
+    fprintf(resultado, "\tmov ecx, dosPuntos\n");
+    fprintf(resultado, "\tmov edx, 1\n");
+    fprintf(resultado, "\tint 80h\n");
+    fprintf(resultado, "%%endmacro\n\n");
+
     fprintf(resultado, "%%macro leer 1\n");
+    fprintf(resultado, "\timprimirDosPuntos\n");
     fprintf(resultado, "\tmov ebp, 0\n");
     fprintf(resultado, "\tmov eax, 3\n");
     fprintf(resultado, "\tmov ebx, 0\n");

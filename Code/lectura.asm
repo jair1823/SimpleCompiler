@@ -10,6 +10,8 @@ section .bss
 section .data
 	menos db 45
 
+	dosPuntos db 58
+
 section .text
 	global _start
 
@@ -36,7 +38,16 @@ section .text
 	int 80h
 %endmacro
 
+%macro imprimirDosPuntos 0
+	mov eax, 4
+	mov ebx, 1
+	mov ecx, dosPuntos
+	mov edx, 1
+	int 80h
+%endmacro
+
 %macro leer 1
+	imprimirDosPuntos
 	mov ebp, 0
 	mov eax, 3
 	mov ebx, 0
